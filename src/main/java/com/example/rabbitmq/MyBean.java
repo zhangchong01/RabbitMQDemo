@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class MyBean {
     @Bean
     public Queue queue() {
-//         队列持久化
+        // 队列持久化
         Queue queue = new Queue(RABBIT.QUEUE, true);
         return queue;
     }
@@ -32,11 +32,12 @@ public class MyBean {
         log.debug("receive msg:", message);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-//            int i = 1 / 0;
+            // int i = 1 / 0;
             channel.basicAck(deliveryTag, false);
             log.info(content);
         } catch (Exception e) {
-//            channel.basicNack(deliveryTag, false, false);
+            // channel.basicNack(deliveryTag, false, false);
+            // 拒绝消息
             channel.basicReject(deliveryTag, false);
             throw e;
         }
