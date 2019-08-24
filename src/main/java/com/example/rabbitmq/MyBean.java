@@ -33,14 +33,14 @@ public class MyBean {
         return BindingBuilder.bind(queue).to(exchange).with(RABBIT.ROUTING_KEY);
     }
 
-    @RabbitListener(queues = RABBIT.QUEUE, exclusive = false, containerFactory = "rabbitListenerContainerFactory")
-    public void processMessage(Message message, Channel channel, String content) throws Exception {
+    @RabbitListener(queues = RABBIT.QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    public void processMessage(Message message, Channel channel, Map content) throws Exception {
         log.debug("receive msg:", message);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
             // int i = 1 / 0;
             channel.basicAck(deliveryTag, false);
-            log.info(content);
+            log.info(content.toString());
         } catch (Exception e) {
             // channel.basicNack(deliveryTag, false, false);
             // 拒绝消息
