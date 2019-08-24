@@ -7,13 +7,19 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Component
 public class MyBean {
     @Bean
     public Queue queue() {
-        // 队列持久化
-        Queue queue = new Queue(RABBIT.QUEUE, true);
+        Map<String, Object> args = new HashMap<String, Object>();
+        // 设置队列长度
+        args.put("x-max-length", 1000);
+        // 持久化队列
+        Queue queue = new Queue(RABBIT.QUEUE, true, false, false, args);
         return queue;
     }
 
