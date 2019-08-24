@@ -3,6 +3,7 @@ package com.example.rabbitmq;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory.CacheMode;
 import org.springframework.amqp.support.converter.ContentTypeDelegatingMessageConverter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -20,6 +21,10 @@ public class RabbitConf {
         // 消息送达交换机确认
         factory.setPublisherConfirms(true);
         factory.setPublisherReturns(true);
+        // 设置缓存模式
+        factory.setCacheMode(CacheMode.CONNECTION);
+        // 设置缓存数
+        factory.setConnectionCacheSize(8);
         factory.setChannelCacheSize(8);
         return factory;
     }
