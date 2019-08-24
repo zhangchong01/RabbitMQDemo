@@ -17,7 +17,7 @@ public class MyBean {
     public Queue queue() {
         Map<String, Object> args = new HashMap<String, Object>();
         // 设置队列长度
-        args.put("x-max-length", 1000);
+        // args.put("x-max-length", 1000);
         // 持久化队列
         Queue queue = new Queue(RABBIT.QUEUE, true, false, false, args);
         return queue;
@@ -33,7 +33,7 @@ public class MyBean {
         return BindingBuilder.bind(queue).to(exchange).with(RABBIT.ROUTING_KEY);
     }
 
-    @RabbitListener(queues = RABBIT.QUEUE, concurrency = "8")
+    @RabbitListener(queues = RABBIT.QUEUE, exclusive = false, containerFactory = "rabbitListenerContainerFactory")
     public void processMessage(Message message, Channel channel, String content) throws Exception {
         log.debug("receive msg:", message);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();

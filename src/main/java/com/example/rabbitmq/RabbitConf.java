@@ -17,6 +17,7 @@ public class RabbitConf {
     @Bean
     public CachingConnectionFactory cachingConnectionFactory(){
         CachingConnectionFactory factory = new CachingConnectionFactory();
+        // 消息送达交换机确认
         factory.setPublisherConfirms(true);
         factory.setPublisherReturns(true);
         factory.setChannelCacheSize(8);
@@ -32,8 +33,14 @@ public class RabbitConf {
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(CachingConnectionFactory cachingConnectionFactory, MessageConverter messageConverter) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(cachingConnectionFactory);
+        // 消息转换器
         factory.setMessageConverter(messageConverter);
+        // ack模式
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        // 消费者并发数
+        factory.setConcurrentConsumers(8);
+        // 预取消息数
+        factory.setPrefetchCount(8);
         return factory;
     }
 }

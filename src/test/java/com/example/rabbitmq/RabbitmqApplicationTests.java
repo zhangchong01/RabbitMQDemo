@@ -27,7 +27,7 @@ public class RabbitmqApplicationTests {
     public void sendMsg() {
         log.info("send msg");
 
-       // 设置消息入队失败回调
+        // 设置消息入队失败回调
         rabbitTemplate.setMandatory(true);
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
             @Override
@@ -37,7 +37,7 @@ public class RabbitmqApplicationTests {
             }
         });
 
-       // 设置消息发送至交换机回调
+        // 设置消息发送至交换机回调
         rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
             @Override
             public void returnedMessage(Message message, int i, String s, String s1, String s2) {
@@ -50,7 +50,12 @@ public class RabbitmqApplicationTests {
         // 开启消息持久化
         messageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
         messageProperties.setReceivedDeliveryMode(MessageDeliveryMode.PERSISTENT);
-        Message message = messageConverter.toMessage("0434", messageProperties);
-        rabbitTemplate.send(RABBIT.EXCHANGE, "st.qa", message);
+        for (int i = 0; i < 1000; i++) {
+            Message message = messageConverter.toMessage(i, messageProperties);
+            rabbitTemplate.send(RABBIT.EXCHANGE, "st.qa", message);
+        }
+        // if (rabbitTemplate.waitForConfirms(1000)){
+        //     log.info("confirmed");
+        // }
     }
 }
