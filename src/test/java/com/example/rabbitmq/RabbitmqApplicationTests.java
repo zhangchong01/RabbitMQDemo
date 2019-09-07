@@ -8,10 +8,12 @@ import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -19,9 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class RabbitmqApplicationTests {
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private MessageConverter messageConverter;
 
     @Test
     public void sendMsg() {
@@ -50,12 +49,10 @@ public class RabbitmqApplicationTests {
         // 开启消息持久化
         messageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
         messageProperties.setReceivedDeliveryMode(MessageDeliveryMode.PERSISTENT);
-        for (int i = 0; i < 1000; i++) {
-            Message message = messageConverter.toMessage(i, messageProperties);
-            rabbitTemplate.send(RABBIT.EXCHANGE, "st.qa", message);
-        }
-        // if (rabbitTemplate.waitForConfirms(1000)){
-        //     log.info("confirmed");
-        // }
+        messageProperties.setMessageId(UUID.randomUUID().toString());
+        Jackson2JsonMessageConverter messageConverter = new Jackson2JsonMessageConverter();
+        Exception exception = new Exception("msg");
+        Message message = messageConverter.toMessage(exception, messageProperties);
+        rabbitTemplate.send(RabbitConstant.EXCHANGE, "demo.test", message);
     }
 }
