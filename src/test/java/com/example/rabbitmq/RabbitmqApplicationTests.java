@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -21,6 +23,9 @@ import java.util.UUID;
 public class RabbitmqApplicationTests {
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private MsgSender msgSender;
 
     @Test
     public void sendMsg() {
@@ -54,5 +59,20 @@ public class RabbitmqApplicationTests {
         Exception exception = new Exception("msg");
         Message message = messageConverter.toMessage(exception, messageProperties);
         rabbitTemplate.send(RabbitConstant.EXCHANGE, "demo.test", message);
+    }
+
+    @Test
+    public void testSender() {
+        Map msg = new HashMap();
+        msg.put("B", "msg");
+        msgSender.sendWithCallBack(
+            "demo_exc", "demo.test", msg,
+            (correlationData, ack, cause) -> {
+                log.info("confirm...");
+            },
+            (message, replyCode, replyText, exchange, routingKey) -> {
+                log.info("return...");
+            }
+        );
     }
 }
